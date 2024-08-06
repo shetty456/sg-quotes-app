@@ -37,6 +37,11 @@ class QuoteDisplayCard extends StatelessWidget {
     final width = size.width;
     final height = size.height;
 
+    final todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now()) ==
+            DateFormat('yyyy-MM-dd').format(date!)
+        ? "Today"
+        : DateFormat('d MMM yyyy').format(date!);
+
     Map<String, HighlightedWord> words = {
       searchText: HighlightedWord(
         textStyle: TextStyle(
@@ -58,7 +63,7 @@ class QuoteDisplayCard extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                Text(DateFormat('d MMM yyyy').format(date!)),
+                Text(todayDate),
                 Expanded(
                   child: Container(
                     width: width * 0.9,
@@ -114,7 +119,7 @@ class QuoteDisplayCard extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: SvgPicture.asset(
-                                      'assets/images/quote.svg',
+                                      'assets/images/demo_quote.svg',
                                       colorFilter: const ColorFilter.mode(
                                         Colors.cyan,
                                         BlendMode.srcIn,

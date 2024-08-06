@@ -6,7 +6,7 @@ import 'package:quotes_app/models/quote_model.dart';
 import 'package:quotes_app/services/quote_service.dart';
 
 class QuoteProvider with ChangeNotifier {
-  static const int quoteCount = 5;
+  static const int quoteCount = 30;
   static const int initialQuoteCount = 2;
 
   List<QuoteModel> data = [];
