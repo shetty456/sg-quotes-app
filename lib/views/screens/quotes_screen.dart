@@ -54,14 +54,15 @@ class _QuotesScreenState extends State<QuotesScreen> {
 
     // Use FuzzyWuzzy to filter quotes
     List<QuoteModel> filteredQuotes = quotesModel.data.where((quote) {
-      final score = partialRatio(
+      // update with token set partial ratio for improved performance.
+      final score = tokenSetPartialRatio(
         quote.engText!.toLowerCase(),
         _searchText.toLowerCase(),
       );
       if (_searchText.isEmpty) {
         return score >= 0;
       }
-      return score >= 50; // Adjust the threshold score as needed
+      return score >= 65; // Adjust the threshold score as needed
     }).toList();
 
     final size = MediaQuery.of(context).size;
