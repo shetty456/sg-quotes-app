@@ -59,6 +59,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
         quote.engText!.toLowerCase(),
         _searchText.toLowerCase(),
       );
+      
       if (_searchText.isEmpty) {
         return score >= 0;
       }
