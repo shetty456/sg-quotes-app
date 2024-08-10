@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:intl/intl.dart';
@@ -14,7 +15,6 @@ class QuotesScreen extends StatefulWidget {
 }
 
 class _QuotesScreenState extends State<QuotesScreen> {
-  late PageController _pageController;
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   String _searchText = '';
@@ -23,7 +23,6 @@ class _QuotesScreenState extends State<QuotesScreen> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
     _searchController.addListener(() {
       setState(() {
         _searchText = _searchController.text;
@@ -38,7 +37,6 @@ class _QuotesScreenState extends State<QuotesScreen> {
 
   @override
   void dispose() {
-    _pageController.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
@@ -54,12 +52,11 @@ class _QuotesScreenState extends State<QuotesScreen> {
 
     // Use FuzzyWuzzy to filter quotes
     List<QuoteModel> filteredQuotes = quotesModel.data.where((quote) {
-      // update with token set partial ratio for improved performance.
       final score = tokenSetPartialRatio(
         quote.engText!.toLowerCase(),
         _searchText.toLowerCase(),
       );
-      
+
       if (_searchText.isEmpty) {
         return score >= 0;
       }
@@ -70,16 +67,6 @@ class _QuotesScreenState extends State<QuotesScreen> {
     final width = size.width;
 
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: const Color(0xFFF4F0E5),
-      //   title: Text(
-      //     todayDate,
-      //     style: const TextStyle(
-      //       fontWeight: FontWeight.w600,
-      //     ),
-      //   ),
-      //   centerTitle: true,
-      // ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -136,17 +123,21 @@ class _QuotesScreenState extends State<QuotesScreen> {
                     ? const Center(
                         child: Text('No quotes found.'),
                       )
-                    : PageView.builder(
-                        controller: _pageController,
-                        scrollDirection: Axis.horizontal,
-                        reverse: true,
-                        onPageChanged: (index) {
-                          final quote = filteredQuotes[index];
-                          Provider.of<QuoteProvider>(context, listen: false)
-                              .setDate(quote.date);
-                        },
+                    : CarouselSlider.builder(
                         itemCount: filteredQuotes.length,
-                        itemBuilder: (context, index) {
+                        options: CarouselOptions(
+                          height: double.infinity,
+                          enlargeCenterPage: true,
+                          viewportFraction: 1.0,
+                          enableInfiniteScroll: false,
+                          reverse: true,
+                          onPageChanged: (index, reason) {
+                            final quote = filteredQuotes[index];
+                            Provider.of<QuoteProvider>(context, listen: false)
+                                .setDate(quote.date);
+                          },
+                        ),
+                        itemBuilder: (context, index, realIndex) {
                           final quote = filteredQuotes[index];
                           return QuoteDisplayCard(
                             id: quote.id.toString(),

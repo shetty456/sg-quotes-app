@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:ui';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:intl/intl.dart';
 import 'package:quotes_app/views/widgets/bold_substring.dart';
+import 'package:shimmer/shimmer.dart';
 
 class QuoteDisplayCard extends StatelessWidget {
   final String id;
@@ -37,20 +40,29 @@ class QuoteDisplayCard extends StatelessWidget {
     final width = size.width;
     final height = size.height;
 
+    final imageHeight = height * 0.26;
+    final imageWidth = double.infinity;
+    final BoxFit imageBoxFit = BoxFit.fill;
+
     final todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now()) ==
             DateFormat('yyyy-MM-dd').format(date!)
         ? "Today"
         : DateFormat('d MMM yyyy').format(date!);
 
-    Map<String, HighlightedWord> words = {
-      searchText: HighlightedWord(
-        textStyle: TextStyle(
-          color: Colors.red,
-          fontSize: engText.length > 150 ? 16 : 20,
-          fontWeight: FontWeight.w400,
-        ),
-      )
-    };
+    // Map<String, HighlightedWord> words = {
+    //   searchText: HighlightedWord(
+    //     textStyle: TextStyle(
+    //       color: Colors.red,
+    //       fontSize: engText.length > 150 ? 16 : 20,
+    //       fontWeight: FontWeight.w400,
+    //     ),
+    //   )
+    // };
+
+    Future<bool> unblurImage() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+      return true;
+    }
 
     return isSearchFocused
         ? const Center(
@@ -82,17 +94,64 @@ class QuoteDisplayCard extends StatelessWidget {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8.0),
                               child: CachedNetworkImage(
+                                imageBuilder: (context, imageProvider) {
+                                  return FutureBuilder<bool>(
+                                    future: unblurImage(),
+                                    builder: (context, snapshot) {
+                                      bool isBlurred = !snapshot.hasData ||
+                                          snapshot.connectionState !=
+                                              ConnectionState.done;
+
+                                      return AnimatedSwitcher(
+                                        switchInCurve: Curves.easeIn,
+                                        duration:
+                                            const Duration(milliseconds: 100),
+                                        child: isBlurred
+                                            ? ImageFiltered(
+                                                imageFilter: ImageFilter.blur(
+                                                  sigmaX: 20,
+                                                  sigmaY: 20,
+                                                ),
+                                                child: Image(
+                                                  image: imageProvider,
+                                                  fit: imageBoxFit,
+                                                  width: imageWidth,
+                                                ),
+                                              )
+                                            : Image(
+                                                image: imageProvider,
+                                                fit: imageBoxFit,
+                                                width: imageWidth,
+                                              ),
+                                      );
+                                    },
+                                  );
+                                },
                                 imageUrl: imageName,
                                 // imageUrl: "https://quotes.isha.in/resources/jul-27-20161018_chi_0512-e.jpg",
                                 // imageUrl:
                                 //     'https://images.news18.com/ibnlive/uploads/2023/03/sadhguru.jpg',
-                                placeholder: (context, url) => const Center(
-                                    child: CircularProgressIndicator()),
+                                placeholder: (context, url) =>
+                                    Shimmer.fromColors(
+                                  baseColor: Colors.grey.shade300,
+                                  highlightColor: Colors.white,
+                                  enabled: true,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Container(
+                                      height: height * 0.26,
+                                      width: double.infinity,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                                 errorWidget: (context, url, error) =>
                                     const Icon(Icons.error),
-                                height: height * 0.26,
-                                fit: BoxFit.fill,
-                                width: double.infinity,
+                                height: imageHeight,
+                                fit: imageBoxFit,
+                                width: imageWidth,
                               ),
                             ),
                             Positioned(
@@ -114,7 +173,6 @@ class QuoteDisplayCard extends StatelessWidget {
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
-                                mainAxisSize: MainAxisSize.max,
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -130,15 +188,16 @@ class QuoteDisplayCard extends StatelessWidget {
                                   const SizedBox(
                                     height: 16.0,
                                   ),
-                                  AutoSizeText(
-                                    engText,
-                                    maxLines: 6,
-                                    textAlign: TextAlign.center,
-                                  ).boldSubString(
-                                    searchText,
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400,
+                                  Expanded(
+                                    child: AutoSizeText(
+                                      engText,
+                                      textAlign: TextAlign.center,
+                                    ).boldSubString(
+                                      searchText,
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w400,
+                                      ),
                                     ),
                                   ),
                                   // TextHighlight(
