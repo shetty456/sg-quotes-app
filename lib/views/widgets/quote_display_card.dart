@@ -1,11 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:ui';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:highlight_text/highlight_text.dart';
 import 'package:intl/intl.dart';
 import 'package:quotes_app/views/widgets/bold_substring.dart';
 import 'package:shimmer/shimmer.dart';
@@ -49,21 +46,6 @@ class QuoteDisplayCard extends StatelessWidget {
         ? "Today"
         : DateFormat('d MMM yyyy').format(date!);
 
-    // Map<String, HighlightedWord> words = {
-    //   searchText: HighlightedWord(
-    //     textStyle: TextStyle(
-    //       color: Colors.red,
-    //       fontSize: engText.length > 150 ? 16 : 20,
-    //       fontWeight: FontWeight.w400,
-    //     ),
-    //   )
-    // };
-
-    Future<bool> unblurImage() async {
-      await Future.delayed(const Duration(milliseconds: 500));
-      return true;
-    }
-
     return isSearchFocused
         ? const Center(
             child: Padding(
@@ -94,39 +76,38 @@ class QuoteDisplayCard extends StatelessWidget {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8.0),
                               child: CachedNetworkImage(
-                                imageBuilder: (context, imageProvider) {
-                                  return FutureBuilder<bool>(
-                                    future: unblurImage(),
-                                    builder: (context, snapshot) {
-                                      bool isBlurred = !snapshot.hasData ||
-                                          snapshot.connectionState !=
-                                              ConnectionState.done;
+                                // imageBuilder: (context, imageProvider) {
+                                //   return FutureBuilder<bool>(
+                                //     future: unblurImage(),
+                                //     builder: (context, snapshot) {
+                                //       bool isBlurred = !snapshot.hasData ||
+                                //           snapshot.connectionState !=
+                                //               ConnectionState.done;
+                                //       return AnimatedSwitcher(
 
-                                      return AnimatedSwitcher(
-                                        switchInCurve: Curves.easeIn,
-                                        duration:
-                                            const Duration(milliseconds: 100),
-                                        child: isBlurred
-                                            ? ImageFiltered(
-                                                imageFilter: ImageFilter.blur(
-                                                  sigmaX: 20,
-                                                  sigmaY: 20,
-                                                ),
-                                                child: Image(
-                                                  image: imageProvider,
-                                                  fit: imageBoxFit,
-                                                  width: imageWidth,
-                                                ),
-                                              )
-                                            : Image(
-                                                image: imageProvider,
-                                                fit: imageBoxFit,
-                                                width: imageWidth,
-                                              ),
-                                      );
-                                    },
-                                  );
-                                },
+                                //         duration:
+                                //             const Duration(milliseconds: 1500),
+                                //         child: isBlurred
+                                //             ? ImageFiltered(
+                                //                 imageFilter: ImageFilter.blur(
+                                //                   sigmaX: 30,
+                                //                   sigmaY: 30,
+                                //                 ),
+                                //                 child: Image(
+                                //                   image: imageProvider,
+                                //                   fit: imageBoxFit,
+                                //                   width: imageWidth,
+                                //                 ),
+                                //               )
+                                //             : Image(
+                                //                 image: imageProvider,
+                                //                 fit: imageBoxFit,
+                                //                 width: imageWidth,
+                                //               ),
+                                //       );
+                                //     },
+                                //   );
+                                // },
                                 imageUrl: imageName,
                                 // imageUrl: "https://quotes.isha.in/resources/jul-27-20161018_chi_0512-e.jpg",
                                 // imageUrl:
@@ -195,20 +176,11 @@ class QuoteDisplayCard extends StatelessWidget {
                                     ).boldSubString(
                                       searchText,
                                       style: const TextStyle(
-                                        fontSize: 24,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.w400,
                                       ),
                                     ),
                                   ),
-                                  // TextHighlight(
-                                  //   textAlign: TextAlign.center,
-                                  //   text: engText,
-                                  //   words: words,
-                                  //   textStyle: TextStyle(
-                                  //     fontSize: engText.length > 150 ? 16 : 20,
-                                  //     fontWeight: FontWeight.w400,
-                                  //   ),
-                                  // ),
                                   const SizedBox(
                                     height: 8.0,
                                   ),
@@ -228,7 +200,6 @@ class QuoteDisplayCard extends StatelessWidget {
                 const SizedBox(
                   height: 12.0,
                 ),
-                // Text('${engText.length}'),
                 announcement.isNotEmpty &&
                         DateFormat('yyyy-MM-dd').format(DateTime.now()) ==
                             DateFormat('yyyy-MM-dd').format(date!)

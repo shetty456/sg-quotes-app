@@ -16,6 +16,8 @@ class QuotesScreen extends StatefulWidget {
 
 class _QuotesScreenState extends State<QuotesScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final CarouselSliderController carouselSliderController =
+      CarouselSliderController();
   final FocusNode _searchFocusNode = FocusNode();
   String _searchText = '';
   bool _isSearchFocused = false;
@@ -67,6 +69,15 @@ class _QuotesScreenState extends State<QuotesScreen> {
     final width = size.width;
 
     return Scaffold(
+      floatingActionButton: todayDate != "Today"
+          ? FloatingActionButton(
+              child: const Icon(Icons.restore),
+              onPressed: () async {
+                carouselSliderController.animateToPage(0,
+                    duration: const Duration(milliseconds: 300));
+              },
+            )
+          : null,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -124,6 +135,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
                         child: Text('No quotes found.'),
                       )
                     : CarouselSlider.builder(
+                        carouselController: carouselSliderController,
                         itemCount: filteredQuotes.length,
                         options: CarouselOptions(
                           height: double.infinity,
