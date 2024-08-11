@@ -1,3 +1,4 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quotes_app/providers/quote_provider.dart';
@@ -9,13 +10,17 @@ void main() async {
   await quoteProvider.initialize();
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider<QuoteProvider>.value(
-          value: quoteProvider,
-        ),
-      ],
-      child: const MyApp(),
+    DevicePreview(
+      builder: (BuildContext context) {
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider<QuoteProvider>.value(
+              value: quoteProvider,
+            ),
+          ],
+          child: const MyApp(),
+        );
+      },
     ),
   );
 }
@@ -27,6 +32,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // ignore: deprecated_member_use
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
