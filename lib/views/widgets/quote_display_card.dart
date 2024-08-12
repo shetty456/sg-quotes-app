@@ -1,11 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:ui';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:quotes_app/views/widgets/bold_substring.dart';
 import 'package:shimmer/shimmer.dart';
+
+import 'package:quotes_app/views/widgets/bold_substring.dart';
 
 class QuoteDisplayCard extends StatelessWidget {
   final String id;
@@ -17,6 +20,7 @@ class QuoteDisplayCard extends StatelessWidget {
   final String searchText;
   final DateTime? date;
   final bool isSearchFocused;
+  final double blurValue;
 
   const QuoteDisplayCard({
     super.key,
@@ -29,6 +33,7 @@ class QuoteDisplayCard extends StatelessWidget {
     required this.searchText,
     required this.date,
     required this.isSearchFocused,
+    required this.blurValue,
   });
 
   @override
@@ -77,38 +82,49 @@ class QuoteDisplayCard extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
                         child: CachedNetworkImage(
-                          // imageBuilder: (context, imageProvider) {
-                          //   return FutureBuilder<bool>(
-                          //     future: unblurImage(),
-                          //     builder: (context, snapshot) {
-                          //       bool isBlurred = !snapshot.hasData ||
-                          //           snapshot.connectionState !=
-                          //               ConnectionState.done;
-                          //       return AnimatedSwitcher(
+                          imageBuilder: (context, imageProvider) {
+                            return ImageFiltered(
+                              imageFilter: ImageFilter.blur(
+                                sigmaX: blurValue,
+                                sigmaY: blurValue,
+                              ),
+                              child: Image(
+                                image: imageProvider,
+                                fit: imageBoxFit,
+                                width: imageWidth,
+                              ),
+                            );
+                            // return FutureBuilder<bool>(
+                            //   future: unblurImage(),
+                            //   builder: (context, snapshot) {
+                            //     bool isBlurred = !snapshot.hasData ||
+                            //         snapshot.connectionState !=
+                            //             ConnectionState.done;
+                            //     return AnimatedSwitcher(
 
-                          //         duration:
-                          //             const Duration(milliseconds: 1500),
-                          //         child: isBlurred
-                          //             ? ImageFiltered(
-                          //                 imageFilter: ImageFilter.blur(
-                          //                   sigmaX: 30,
-                          //                   sigmaY: 30,
-                          //                 ),
-                          //                 child: Image(
-                          //                   image: imageProvider,
-                          //                   fit: imageBoxFit,
-                          //                   width: imageWidth,
-                          //                 ),
-                          //               )
-                          //             : Image(
-                          //                 image: imageProvider,
-                          //                 fit: imageBoxFit,
-                          //                 width: imageWidth,
-                          //               ),
-                          //       );
-                          //     },
-                          //   );
-                          // },
+                            //       duration:
+                            //           const Duration(milliseconds: 1500),
+                            //       child: isBlurred
+                            //           ? ImageFiltered(
+                            //               imageFilter: ImageFilter.blur(
+                            //                 sigmaX: 30,
+                            //                 sigmaY: 30,
+                            //               ),
+                            //               child: Image(
+                            //                 image: imageProvider,
+                            //                 fit: imageBoxFit,
+                            //                 width: imageWidth,
+                            //               ),
+                            //             )
+                            //           : Image(
+                            //               image: imageProvider,
+                            //               fit: imageBoxFit,
+                            //               width: imageWidth,
+                            //             ),
+                            //     );
+                            //   },
+                            // );
+                          },
                           imageUrl: imageName,
                           // imageUrl: "https://quotes.isha.in/resources/jul-27-20161018_chi_0512-e.jpg",
                           // imageUrl:

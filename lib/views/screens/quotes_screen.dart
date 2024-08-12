@@ -1,5 +1,6 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+// import 'dart:ui';
+// import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -16,9 +17,8 @@ class QuotesScreen extends StatefulWidget {
 
 class _QuotesScreenState extends State<QuotesScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final CarouselSliderController carouselSliderController =
-      CarouselSliderController();
   final FocusNode _searchFocusNode = FocusNode();
+  final PageController _pageController = PageController();
   String _searchText = '';
   bool _isSearchFocused = false;
 
@@ -41,6 +41,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
   void dispose() {
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -73,8 +74,11 @@ class _QuotesScreenState extends State<QuotesScreen> {
           ? FloatingActionButton(
               child: const Icon(Icons.restore),
               onPressed: () async {
-                carouselSliderController.animateToPage(0,
-                    duration: const Duration(milliseconds: 300));
+                _pageController.animateToPage(
+                  0,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
               },
             )
           : null,
@@ -134,33 +138,41 @@ class _QuotesScreenState extends State<QuotesScreen> {
                     ? const Center(
                         child: Text('No quotes found.'),
                       )
-                    : CarouselSlider.builder(
-                        carouselController: carouselSliderController,
+                    : PageView.builder(
+                        // replacing page view builder to get accurate data of the page position
+                        reverse: true,
+                        controller: _pageController,
                         itemCount: filteredQuotes.length,
-                        options: CarouselOptions(
-                          height: double.infinity,
-                          enlargeCenterPage: true,
-                          viewportFraction: 1.0,
-                          enableInfiniteScroll: false,
-                          reverse: true,
-                          onPageChanged: (index, reason) {
-                            final quote = filteredQuotes[index];
-                            Provider.of<QuoteProvider>(context, listen: false)
-                                .setDate(quote.date);
-                          },
-                        ),
-                        itemBuilder: (context, index, realIndex) {
+                        onPageChanged: (index) {
                           final quote = filteredQuotes[index];
-                          return QuoteDisplayCard(
-                            id: quote.id.toString(),
-                            showSignature: quote.showSignature.toString(),
-                            engText: quote.engText.toString(),
-                            altTag: quote.altTag.toString(),
-                            announcement: quote.announcement.toString(),
-                            imageName: quote.imageName.toString(),
-                            date: quote.date,
-                            isSearchFocused: _isSearchFocused,
-                            searchText: _searchText,
+                          Provider.of<QuoteProvider>(context, listen: false)
+                              .setDate(quote.date);
+                        },
+                        itemBuilder: (context, index) {
+                          return AnimatedBuilder(
+                            animation: _pageController,
+                            builder: (context, child) {
+                              double value = 1.0;
+                              if (_pageController.position.haveDimensions) {
+                                value = _pageController.page! - index;
+                                value = (1 - value.abs()).clamp(0.0, 1.0);
+                              }
+                              double blur = (1 - value) * 10;
+
+                              final quote = filteredQuotes[index];
+                              return QuoteDisplayCard(
+                                id: quote.id.toString(),
+                                showSignature: quote.showSignature.toString(),
+                                engText: quote.engText.toString(),
+                                altTag: quote.altTag.toString(),
+                                announcement: quote.announcement.toString(),
+                                imageName: quote.imageName.toString(),
+                                date: quote.date,
+                                isSearchFocused: _isSearchFocused,
+                                searchText: _searchText,
+                                blurValue: blur,
+                              );
+                            },
                           );
                         },
                       ),
