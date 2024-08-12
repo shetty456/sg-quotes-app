@@ -157,7 +157,9 @@ class _QuotesScreenState extends State<QuotesScreen> {
                                 value = _pageController.page! - index;
                                 value = (1 - value.abs()).clamp(0.0, 1.0);
                               }
-                              double blur = (1 - value) * 10;
+                              final newValue =
+                                  Curves.easeInExpo.transform(value);
+                              double blur = (1 - newValue) * 10;
 
                               final quote = filteredQuotes[index];
                               return QuoteDisplayCard(

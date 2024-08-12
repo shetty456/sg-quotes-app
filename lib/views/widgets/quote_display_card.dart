@@ -125,10 +125,10 @@ class QuoteDisplayCard extends StatelessWidget {
                             //   },
                             // );
                           },
-                          imageUrl: imageName,
+                          // imageUrl: imageName,
                           // imageUrl: "https://quotes.isha.in/resources/jul-27-20161018_chi_0512-e.jpg",
-                          // imageUrl:
-                          //     'https://images.news18.com/ibnlive/uploads/2023/03/sadhguru.jpg',
+                          imageUrl:
+                              'https://images.news18.com/ibnlive/uploads/2023/03/sadhguru.jpg',
                           placeholder: (context, url) => Shimmer.fromColors(
                             baseColor: Colors.grey.shade300,
                             highlightColor: Colors.white,
